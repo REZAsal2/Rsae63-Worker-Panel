@@ -1872,6 +1872,59 @@ const renderHomePage = async (env, hostName, fragConfigs) => {
                 console.error('Error:', error);
             }
         }
+
+        const resetPassword = async (event) => {
+            event.preventDefault();
+            const modal = document.getElementById('myModal');
+            const newPasswordInput = document.getElementById('newPassword');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const passwordError = document.getElementById('passwordError');             
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+    
+            if (newPassword !== confirmPassword) {
+                passwordError.textContent = "Passwords do not match";
+                return false;
+            }
+
+            const hasCapitalLetter = /[A-Z]/.test(newPassword);
+            const hasNumber = /[0-9]/.test(newPassword);
+            const isLongEnough = newPassword.length >= 8;
+
+            if (!(hasCapitalLetter && hasNumber && isLongEnough)) {
+                passwordError.textContent = '⚠️ Password must contain at least one capital letter, one number, and be at least 8 characters long.';
+                return false;
+            }
+                    
+            try {
+                const response = await fetch('/panel/password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    },
+                    body: newPassword,
+                    credentials: 'same-origin'
+                });
+            
+                if (response.ok) {
+                    modal.style.display = "none";
+                    document.body.style.overflow = "";
+                    alert("Password changed successfully! 🥳👍");
+                    window.location.href = '/login';
+                } else if (response.status === 401) {
+                    const errorMessage = await response.text();
+                    passwordError.textContent = '⚠️ ' + errorMessage;
+                    console.error(errorMessage, response.status);
+                    alert('⚠️ Session expired! Please login again.');
+                    window.location.href = '/login';
+                } else {
+                    const errorMessage = await response.text();
+                    passwordError.textContent = '⚠️ ' + errorMessage;
+                    console.error(errorMessage, response.status);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
             }
         }
 	</script>
