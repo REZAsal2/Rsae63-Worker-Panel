@@ -1,4 +1,4 @@
-<h1 align="center">bpb_panel
+<h1 align="center">👹reza_panel
   Panel</h1>
 ### 🌏 Readme in [Farsi](README_fa.md)
 
